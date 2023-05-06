@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useState, memo} from "react";
 import {xmpp} from "./src/XMPP/xmpp";
 import {Outlet} from "react-router-dom";
 import {useNavigate} from "react-router-dom";
@@ -10,7 +10,8 @@ xmpp.register()
 peerConnection.init()
 
 
-function App() {
+const  App= memo(function() {
+  console.log('mounter')
   const navigate = useNavigate()
   const [connection, setConnection] = useState<any>(null)
   const [pcLoaded, setPcLoaded] = useState<any>(null)
@@ -31,9 +32,10 @@ function App() {
     setPcLoaded(true)
     args[0].forEach((streams: any)=>{
       streams.getTracks().forEach((stream:MediaStreamTrack)=>{
-        console.log(stream)
+        peerConnection.addTrack(stream)
       })
     })
+    peerConnection.createOffer()
   }
 
   function allLoaded() {
@@ -50,6 +52,6 @@ function App() {
     </div>
 
   );
-}
+})
 
 export default App
