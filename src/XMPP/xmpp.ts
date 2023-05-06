@@ -36,8 +36,7 @@ class XMPP {
         } else if (status === Strophe.Status.REGIFAIL) {
           console.log("The Server does not support In-Band Registration")
         } else if (status === Strophe.Status.CONNECTED) {
-          this.emit("xmppRegistred")
-          this.emit('getConnection', this.getConnection())
+          this.emit("registred", this.getConnection())
         }
       }
 
