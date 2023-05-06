@@ -12,7 +12,7 @@ const stylesHandler = MiniCssExtractPlugin.loader;
 
 
 const config = {
-    entry: ['./startPage','./src/index.tsx'],
+    entry: ['/src/index.tsx'],
     output: {
         path: path.resolve(__dirname, 'dist'),
         filename: '[name].bundle.js',
@@ -59,6 +59,14 @@ const config = {
     },
     resolve: {
         extensions: ['.tsx', '.ts', '.jsx', '.js', '...'],
+    },
+    devServer: {
+        historyApiFallback: true,
+        static: {
+            directory: path.join(__dirname, "/"),
+        },
+        port: 8080,
+        open: true
     },
 };
 

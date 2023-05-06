@@ -17,10 +17,7 @@ class XMPP {
 
   register() {
     this.xmpp.then((connection: any) => {
-      console.log(connection)
       this.conn = connection
-
-
       const callbackRegistry = (status: number) => {
         if (status === Strophe.Status.REGISTER) {
           // fill out the fields
@@ -40,6 +37,7 @@ class XMPP {
           console.log("The Server does not support In-Band Registration")
         } else if (status === Strophe.Status.CONNECTED) {
           this.emit("xmppRegistred")
+          this.emit('getConnection', this.getConnection())
         }
       }
 
@@ -59,12 +57,14 @@ class XMPP {
   }
 
   emit(event: string, ...args: any[]) {
-    if (this._listener[event]) {
+    if (!this._listener[event]) {
       console.error('Такая функция не установлена')
+    } else {
+      this._listener[event].forEach((listener: Function) => {
+        listener(args)
+      })
     }
-    this._listener[event].forEach((listener: Function) => {
-      listener(args)
-    })
+
   }
 }
 
