@@ -1,6 +1,5 @@
 // Generated using webpack-cli https://github.com/webpack/webpack-cli
-
-const path = require('path');
+const path= require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const process = require("process");
@@ -13,7 +12,7 @@ const stylesHandler = MiniCssExtractPlugin.loader;
 
 
 const config = {
-    entry: ['./src/index.tsx'],
+    entry: ['./startPage','./src/index.tsx'],
     output: {
         path: path.resolve(__dirname, 'dist'),
         filename: '[name].bundle.js',
