@@ -1,7 +1,7 @@
 class PeerConnection {
   private pc: RTCPeerConnection;
   private streams: Promise<unknown>;
-  private listener: { [key: string]: [...Function[]] };
+  private _listener: { [key: string]: [...Function[]] };
 
   constructor() {
     this.pc = new RTCPeerConnection({
@@ -15,7 +15,7 @@ class PeerConnection {
     this.streams = new Promise((resolve: any, reject: any) => {
       resolve(navigator.mediaDevices.getUserMedia({video: true, audio: true}))
     })
-    this.listener = {}
+    this._listener = {}
   }
 
   init() {
@@ -23,7 +23,6 @@ class PeerConnection {
       if (event.candidate===null) {
         console.log(event, 'onicecandidate')
       }
-
     }
     this.streams.then((streams: any) => {
       this.emit('getLocalStreams', streams)
@@ -38,16 +37,16 @@ class PeerConnection {
     })
   }
   on (event : string, callback : Function) {
-    if (!this.listener[event]) {
-      this.listener[event]=[]
+    if (!this._listener[event]) {
+      this._listener[event]=[]
     }
-    this.listener[event].push(callback)
+    this._listener[event].push(callback)
   }
   emit(event : string, ...args : any[]) {
-    if (!this.listener[event]) {
+    if (!this._listener[event]) {
       console.error('Такой слушатель не зарегестрирован')
     } else {
-      this.listener[event].forEach((listener: Function)=>{
+      this._listener[event].forEach((listener: Function)=>{
         listener(args)
       })
     }

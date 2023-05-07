@@ -1,4 +1,4 @@
-import React, {useState, memo} from "react";
+import React, {useState, memo, useEffect} from "react";
 import {xmpp} from "./src/XMPP/xmpp";
 import {Outlet} from "react-router-dom";
 import {useNavigate} from "react-router-dom";
@@ -11,12 +11,16 @@ peerConnection.init()
 
 
 const  App= memo(function() {
-  console.log('mounter')
+  useEffect(()=>{
+    peerConnection.on('getLocalStreams', getLocalStreams)
+    xmpp.on('registred', registred)
+  },[])
+
   const navigate = useNavigate()
   const [connection, setConnection] = useState<any>(null)
   const [pcLoaded, setPcLoaded] = useState<any>(null)
-  xmpp.on('registred', registred)
-  peerConnection.on('getLocalStreams', getLocalStreams)
+
+
 
   function registred(...args: any) {
     setConnection(args[0])
