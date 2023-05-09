@@ -47,12 +47,23 @@ class XMPP {
   getConnection() {
     return this.conn
   }
+  doSignaling(message : any) {
+    console.log(message, 'this. is message')
+  }
+  addHandler() {
+    const conn=this.getConnection()
+    conn.addHandler(messageHandler)
+    function messageHandler(stanza: any) {
+      console.log(stanza)
+    }
+  }
 
   on(event: string, callback: () => void) {
     if (!this._listener[event]) {
       this._listener[event] = []
     }
     this._listener[event].push(callback)
+    console.log(this._listener)
   }
 
   emit(event: string, ...args: any[]) {

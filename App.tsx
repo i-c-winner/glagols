@@ -7,8 +7,15 @@ import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
 
 xmpp.register()
+peerConnection.on('doSignaling', doSignaling)
 peerConnection.init()
-
+xmpp.on('addHandler', addHandler)
+function addHandler() {
+  xmpp.addHandler()
+}
+function doSignaling(...args: any) {
+  xmpp.doSignaling(args[0])
+}
 
 const  App= memo(function() {
   useEffect(()=>{

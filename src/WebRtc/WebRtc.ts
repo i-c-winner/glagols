@@ -19,21 +19,28 @@ class PeerConnection {
   }
 
   init() {
-    this.pc.onicecandidate=function(event) {
+    this.pc.onicecandidate=(event) =>{
       if (event.candidate===null) {
-        console.log(event, 'onicecandidate')
+        const localDescription=this.pc.localDescription
+        const offer=window.btoa(JSON.stringify(localDescription))
+        this.emit('doSignaling', offer)
       }
     }
     this.streams.then((streams: any) => {
       this.emit('getLocalStreams', streams)
     })
   }
+  getPeerConnection() {
+    return this.pc
+  }
   addTrack(track: any) {
-    this.pc.addTrack(track)
+    const pc=this.getPeerConnection()
+    pc.addTrack(track)
   }
   createOffer () {
-    this.pc.createOffer().then((offer: any)=>{
-      this.pc.setLocalDescription(offer)
+    const pc=this.getPeerConnection()
+    pc.createOffer().then((offer: any)=>{
+      pc.setLocalDescription(offer)
     })
   }
   on (event : string, callback : Function) {
