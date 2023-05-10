@@ -8,39 +8,25 @@ import Button from '@mui/material/Button';
 
 xmpp.on('xmppConnected', xmppConnected)
 function xmppConnected() {
-  xmpp.init()
+  peerConnection.init()
 }
 
 peerConnection.on('peerConnected', peerConnected)
+peerConnection.on('doSignaling', doSignaling)
+
+function doSignaling(...args: any) {
+  xmpp.doSignaling(args[0])
+}
 function peerConnected(...args: any)  {
   peerConnection.addTracks(args)
 }
 
 const  App= memo(function() {
-
-  useEffect(()=>{
-    peerConnection.on('getLocalStreams', getLocalStreams)
-
-  },[])
-
   const navigate = useNavigate()
   const [connection, setConnection] = useState<any>(null)
   const [pcLoaded, setPcLoaded] = useState<any>(null)
 
 
-
-
-
-  function getLocalStreams(...args: any[]) {
-    const pc=peerConnection.getPeerConnection()
-    setPcLoaded(true)
-    args[0].forEach((streams: any)=>{
-      streams.getTracks().forEach((stream:MediaStreamTrack)=>{
-        pc.addTrack(stream)
-      })
-    })
-    pc.createOffer()
-  }
 
   function allLoaded() {
     return pcLoaded && connection
