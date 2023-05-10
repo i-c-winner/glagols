@@ -13,11 +13,9 @@ class XMPP {
     this.xmpp = new Promise((resolve: any, reject: any) => {
       resolve(new Strophe.Connection('https://xmpp.prosolen.net:5281/http-bind'))
     })
-  }
-
-  register() {
     this.xmpp.then((connection: any) => {
       this.conn = connection
+
       const callbackRegistry = (status: number) => {
         if (status === Strophe.Status.REGISTER) {
           // fill out the fields
@@ -36,34 +34,50 @@ class XMPP {
         } else if (status === Strophe.Status.REGIFAIL) {
           console.log("The Server does not support In-Band Registration")
         } else if (status === Strophe.Status.CONNECTED) {
-          this.emit("registred", this.getConnection())
+          this.emit('xmppConnected')
         }
       }
-
       connection.register.connect("@prosolen.net", callbackRegistry.bind(this))
     })
   }
 
+  init() {
+    const conn=this.getConnection()
+    conn.addHandler(this.addHandler)
+  }
+   addHandler(stanza: any) {
+    console.log(stanza, 'this is stanza')
+  }
   getConnection() {
     return this.conn
   }
-  doSignaling(message : any) {
-    console.log(message, 'this. is message')
-  }
-  addHandler() {
-    const conn=this.getConnection()
-    conn.addHandler(messageHandler)
-    function messageHandler(stanza: any) {
-      console.log(stanza)
-    }
-  }
+  // doSignaling(message : any) {
+  //   const conn=this.getConnection()
+  //   const offer = new Strophe.Builder('message', {
+  //     type: 'chat',
+  //     to: 'admin_cs@prosolen.net'
+  //   }).c('body').t(message)
+  //   console.log(conn, offer)
+  //   conn.send(offer)
+  //   console.log(offer, 'this. is message')
+  // }
+  // addHandler() {
+  //   const conn=this.getConnection()
+  //   conn.addHandler(messageHandler)
+  //   function messageHandler(stanza: any) {
+  //     console.log(stanza, 'stanza')
+  //     const from = stanza.getAttribute('from');
+  //     const type = stanza.getAttribute('type');
+  //     console.log(from, type, )
+  //   }
+  //   console.log(conn)
+  // }
 
   on(event: string, callback: () => void) {
     if (!this._listener[event]) {
       this._listener[event] = []
     }
     this._listener[event].push(callback)
-    console.log(this._listener)
   }
 
   emit(event: string, ...args: any[]) {

@@ -6,21 +6,21 @@ import peerConnection from "./src/WebRtc/WebRtc";
 import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
 
-xmpp.register()
-peerConnection.on('doSignaling', doSignaling)
-peerConnection.init()
-xmpp.on('addHandler', addHandler)
-function addHandler() {
-  xmpp.addHandler()
+xmpp.on('xmppConnected', xmppConnected)
+function xmppConnected() {
+  xmpp.init()
 }
-function doSignaling(...args: any) {
-  xmpp.doSignaling(args[0])
+
+peerConnection.on('peerConnected', peerConnected)
+function peerConnected(...args: any)  {
+  peerConnection.addTracks(args)
 }
 
 const  App= memo(function() {
+
   useEffect(()=>{
     peerConnection.on('getLocalStreams', getLocalStreams)
-    xmpp.on('registred', registred)
+
   },[])
 
   const navigate = useNavigate()
@@ -29,24 +29,17 @@ const  App= memo(function() {
 
 
 
-  function registred(...args: any) {
-    setConnection(args[0])
-    navigate('/createRoom')
-  }
 
-  /**
-   * TO DO Поставить мемомизацию
-   * @param args
-   */
 
   function getLocalStreams(...args: any[]) {
+    const pc=peerConnection.getPeerConnection()
     setPcLoaded(true)
     args[0].forEach((streams: any)=>{
       streams.getTracks().forEach((stream:MediaStreamTrack)=>{
-        peerConnection.addTrack(stream)
+        pc.addTrack(stream)
       })
     })
-    peerConnection.createOffer()
+    pc.createOffer()
   }
 
   function allLoaded() {

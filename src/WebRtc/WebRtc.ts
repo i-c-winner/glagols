@@ -4,6 +4,7 @@ class PeerConnection {
   private _listener: { [key: string]: [...Function[]] };
 
   constructor() {
+    this._listener = {}
     this.pc = new RTCPeerConnection({
       iceServers: [
         {
@@ -11,49 +12,49 @@ class PeerConnection {
         }
       ]
     })
-
+    this.pc.onicecandidate=(event =>{
+      console.log(event)
+    })
     this.streams = new Promise((resolve: any, reject: any) => {
       resolve(navigator.mediaDevices.getUserMedia({video: true, audio: true}))
     })
-    this._listener = {}
-  }
-
-  init() {
-    this.pc.onicecandidate=(event) =>{
-      if (event.candidate===null) {
-        const localDescription=this.pc.localDescription
-        const offer=window.btoa(JSON.stringify(localDescription))
-        this.emit('doSignaling', offer)
-      }
-    }
     this.streams.then((streams: any) => {
-      this.emit('getLocalStreams', streams)
+      this.emit('peerConnected', streams)
     })
   }
+
   getPeerConnection() {
     return this.pc
   }
-  addTrack(track: any) {
-    const pc=this.getPeerConnection()
-    pc.addTrack(track)
+
+  addTracks(streams: any) {
+    console.log(streams[0][0])
+    streams[0][0] .getTracks().forEach((stream: MediaStreamTrack) => {
+      console.log(this.pc.addTrack, stream)
+      this.pc.addTrack(stream)
+    })
+    this._createOffer()
   }
-  createOffer () {
-    const pc=this.getPeerConnection()
-    pc.createOffer().then((offer: any)=>{
+
+  _createOffer() {
+    const pc = this.getPeerConnection()
+    pc.createOffer().then((offer: any) => {
       pc.setLocalDescription(offer)
     })
   }
-  on (event : string, callback : Function) {
+
+  on(event: string, callback: Function) {
     if (!this._listener[event]) {
-      this._listener[event]=[]
+      this._listener[event] = []
     }
     this._listener[event].push(callback)
   }
-  emit(event : string, ...args : any[]) {
+
+  emit(event: string, ...args: any[]) {
     if (!this._listener[event]) {
       console.error('Такой слушатель не зарегестрирован')
     } else {
-      this._listener[event].forEach((listener: Function)=>{
+      this._listener[event].forEach((listener: Function) => {
         listener(args)
       })
     }
