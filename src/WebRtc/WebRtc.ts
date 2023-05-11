@@ -53,7 +53,7 @@ init() {
       pc.setRemoteDescription(description)
     } catch(e)
     {
-
+console.log('error', e)
     }
 
     // const pc = this.getPeerConnection()

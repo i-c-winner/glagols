@@ -46,18 +46,20 @@ class XMPP {
   init() {
   }
 
-  addHandler=(stanza: any)=> {
+  addHandler = (stanza: any) => {
     const from = stanza.getAttribute('from');
     const type = stanza.getAttribute('type');
     const elems = stanza.getElementsByTagName('body');
-    const message=Strophe.getText(elems[0]);
+    const message = Strophe.getText(elems[0]);
 
     console.log(from, type, elems)
-    if (type==='result') {
-      const rtcSd= new RTCSessionDescription((JSON.parse(message)))
-      console.log(message)
-      this.emit('setRemoteDescription', rtcSd)
-      if (message==='add_track') {
+    if (type === 'chat') {
+      if (message === 'add_track') {
+        console.log('add_track')
+      } else {
+        const rtcSd = new RTCSessionDescription((JSON.parse(window.atob(message))))
+        console.log(message)
+        this.emit('setRemoteDescription', rtcSd)
       }
     }
     return true

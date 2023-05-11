@@ -36,9 +36,8 @@ function xmppConnected() {
 }
 function setRemoteDescription(...args : any) {
   console.log('setRemoteDescription')
-  peerConn.then((pc: any)=>{
-
-    pc.setRemoteDescription(args[0])
+  peerConn.then((element: any)=>{
+    element.pc.setRemoteDescription(args[0][0])
   })
 }
 
