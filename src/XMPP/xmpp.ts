@@ -16,10 +16,7 @@ class XMPP {
     })
     this.xmpp.then((connection: any) => {
       this.conn = connection
-      function hand(event: any) {
-        console.log(event)
-        return true
-      }
+      connection.addHandler(this.addHandler)
       const callbackRegistry = (status: number) => {
         if (status === Strophe.Status.REGISTER) {
           // fill out the fields
@@ -38,12 +35,8 @@ class XMPP {
         } else if (status === Strophe.Status.REGIFAIL) {
           console.log("The Server does not support In-Band Registration")
         } else if (status === Strophe.Status.CONNECTED) {
-          console.log('start')
-          connection.addHandler(hand)
-
-          debugger
           this.emit('xmppConnected')
-
+          console.log('connecte')
         }
       }
       connection.register.connect("@prosolen.net", callbackRegistry.bind(this))
@@ -52,22 +45,37 @@ class XMPP {
 
   init() {
   }
-   addHandler(stanza: any) {
-    console.log(stanza, 'this is stanza')
-     return true
+
+  addHandler=(stanza: any)=> {
+    const from = stanza.getAttribute('from');
+    const type = stanza.getAttribute('type');
+    const elems = stanza.getElementsByTagName('body');
+    const message=Strophe.getText(elems[0]);
+
+    console.log(from, type, elems)
+    if (type==='result') {
+      const rtcSd= new RTCSessionDescription((JSON.parse(message)))
+      console.log(message)
+      this.emit('setRemoteDescription', rtcSd)
+      if (message==='add_track') {
+      }
+    }
+    return true
   }
+
   doSignaling(stanza: any) {
-    const conn=this.getConnection()
-    const message: any=new Strophe.Builder('message', {
+    const conn = this.getConnection()
+    const message: any = new Strophe.Builder('message', {
       to: 'admin_cs@prosolen.net',
       type: 'chat'
     }).c('body').t(stanza)
-      console.log('send')
-      conn.send(message)
+    conn.send(message)
   }
+
   getConnection() {
     return this.conn
   }
+
   // doSignaling(message : any) {
   //   const conn=this.getConnection()
   //   const offer = new Strophe.Builder('message', {

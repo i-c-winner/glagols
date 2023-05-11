@@ -14,8 +14,8 @@ class PeerConnection {
     })
     this.pc.onicecandidate=(event =>{
       if (event.candidate===null) {
-        const localDescripotion= window.btoa(JSON.stringify(this.pc.localDescription))
-        this.emit('doSignaling', localDescripotion)
+        const localDescription= window.btoa(JSON.stringify(this.pc.localDescription))
+        this.emit('doSignaling', localDescription)
       }
     })
     this.streams = new Promise((resolve: any, reject: any) => {
@@ -47,6 +47,23 @@ init() {
     })
   }
 
+  setRemoteDescription(description: any) {
+    const pc=this.getPeerConnection()
+    try {
+      pc.setRemoteDescription(description)
+    } catch(e)
+    {
+
+    }
+
+    // const pc = this.getPeerConnection()
+    // pc.addTransceiver('video', {'direction': 'recvonly'})
+    // pc.addTransceiver('audio', {'direction': 'recvonly'})
+    // pc.createOffer({'iceRestart': true}).then(offer =>
+    // {
+    //   pc.setLocalDescription(offer)
+    // })
+  }
   on(event: string, callback: Function) {
     if (!this._listener[event]) {
       this._listener[event] = []
@@ -66,5 +83,5 @@ init() {
   }
 }
 
-const peerConnection = new PeerConnection()
+const peerConnection =()=> new PeerConnection()
 export default peerConnection
