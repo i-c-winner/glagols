@@ -1,4 +1,4 @@
-import React, {useState, memo, useEffect} from "react";
+import React, {useState} from "react";
 import {xmpp} from "./src/XMPP/xmpp";
 import {Outlet} from "react-router-dom";
 import {useNavigate} from "react-router-dom";
@@ -10,16 +10,16 @@ import Button from '@mui/material/Button';
 xmpp.on('setRemoteDescription', setRemoteDescription)
 xmpp.on('xmppConnected', xmppConnected)
 
-const peerConn=new Promise((resolve: any, reject: any)=>{
+const peerConn = new Promise((resolve: any, reject: any) => {
   resolve(peerConnection())
 })
-function xmppConnected() {
- peerConn.then((pc: any)=>{
-   pc.init()
-   pc.on('peerConnected', peerConnected)
-   pc.on('doSignaling', doSignaling)
- })
 
+function xmppConnected() {
+  peerConn.then((pc: any) => {
+    pc.init()
+    pc.on('peerConnected', peerConnected)
+    pc.on('doSignaling', doSignaling)
+  })
 
 
   function doSignaling(...args: any) {
@@ -27,41 +27,58 @@ function xmppConnected() {
   }
 
   function peerConnected(...args: any) {
-   peerConn.then((pc: any)=>{
-     pc.addTracks(args)
-   })
+    peerConn.then((pc: any) => {
+      pc.addTracks(args)
+    })
 
   }
 
 }
-function setRemoteDescription(...args : any) {
-  console.log('setRemoteDescription')
-  peerConn.then((element: any)=>{
+
+function setRemoteDescription(...args: any) {
+  peerConn.then((element: any) => {
     element.pc.setRemoteDescription(args[0][0])
   })
 }
 
 
-const App = memo(function () {
+const App = function () {
   const navigate = useNavigate()
-  const [connection, setConnection] = useState<any>(null)
-  const [pcLoaded, setPcLoaded] = useState<any>(null)
+  const [xmppState, setXmppState] = useState(false)
+  const [peerState, setPeerState] = useState(false)
+  xmpp.on('changeXmppState', changeXmppState)
+  peerConn.then((pc: any) => {
+    pc.on('changePeerState', changePeerState)
+  })
 
-
-  function allLoaded() {
-    return pcLoaded && connection
+  function changeXmppState() {
+    setXmppState(true)
   }
+
+  function changePeerState() {
+    setPeerState(true)
+  }
+
+  function getState() {
+
+    console.log(peerState && xmppState)
+    return peerState && xmppState
+  }
+function goToCreateRoom() {
+    navigate('/createRoom')
+}
+
 
   return (
     <div>
       Main
       <Outlet/>
       <Stack spacing={2} direction="row">
-        <Button variant="outlined" disabled={!allLoaded()}>Enter</Button>
+        <Button variant="outlined" disabled={!getState()} onClick={goToCreateRoom}>Enter</Button>
       </Stack>
     </div>
 
   );
-})
+}
 
 export default App

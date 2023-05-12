@@ -25,6 +25,7 @@ class PeerConnection {
   }
 init() {
   this.streams.then((streams: any) => {
+    this.emit('changePeerState')
     this.emit('peerConnected', streams)
   })
 }

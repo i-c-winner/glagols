@@ -1,6 +1,6 @@
 import {createBrowserRouter} from "react-router-dom";
 import App from "./App";
-import CreateRoom from "./src/Room/CreateRoom";
+import CreateRoom from "./src/components/Room/CreateRoom";
 
 const router = createBrowserRouter([
   {
@@ -13,6 +13,6 @@ const router = createBrowserRouter([
       }
     ]
   },
- 
+
 ])
 export default router
