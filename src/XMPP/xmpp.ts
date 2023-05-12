@@ -37,7 +37,6 @@ class XMPP {
         } else if (status === Strophe.Status.CONNECTED) {
           this.emit('xmppConnected')
           this.emit('changeXmppState')
-          console.log('connecte')
         }
       }
       connection.register.connect("@prosolen.net", callbackRegistry.bind(this))
@@ -52,14 +51,11 @@ class XMPP {
     const type = stanza.getAttribute('type');
     const elems = stanza.getElementsByTagName('body');
     const message = Strophe.getText(elems[0]);
-
-    console.log(from, type, elems)
     if (type === 'chat') {
       if (message === 'add_track') {
         console.log('add_track')
       } else {
         const rtcSd = new RTCSessionDescription((JSON.parse(window.atob(message))))
-        console.log(message)
         this.emit('setRemoteDescription', rtcSd)
       }
     }

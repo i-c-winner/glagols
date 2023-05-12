@@ -1,11 +1,10 @@
-import React, {useState} from "react";
+import React, {useState, createContext,} from "react";
 import {xmpp} from "./src/XMPP/xmpp";
 import {Outlet} from "react-router-dom";
 import {useNavigate} from "react-router-dom";
 import peerConnection from "./src/WebRtc/WebRtc";
 import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
-
 
 xmpp.on('setRemoteDescription', setRemoteDescription)
 xmpp.on('xmppConnected', xmppConnected)
@@ -30,9 +29,7 @@ function xmppConnected() {
     peerConn.then((pc: any) => {
       pc.addTracks(args)
     })
-
   }
-
 }
 
 function setRemoteDescription(...args: any) {
@@ -40,9 +37,12 @@ function setRemoteDescription(...args: any) {
     element.pc.setRemoteDescription(args[0][0])
   })
 }
-
+const ContextOfConnected= createContext({
+  xmpp, peerConn
+})
 
 const App = function () {
+
   const navigate = useNavigate()
   const [xmppState, setXmppState] = useState(false)
   const [peerState, setPeerState] = useState(false)
@@ -60,25 +60,26 @@ const App = function () {
   }
 
   function getState() {
-
-    console.log(peerState && xmppState)
     return peerState && xmppState
   }
-function goToCreateRoom() {
-    navigate('/createRoom')
-}
 
+  function goToCreateRoom() {
+    navigate('/createRoom')
+  }
 
   return (
-    <div>
-      Main
-      <Outlet/>
-      <Stack spacing={2} direction="row">
-        <Button variant="outlined" disabled={!getState()} onClick={goToCreateRoom}>Enter</Button>
-      </Stack>
-    </div>
+    <ContextOfConnected.Provider value={{xmpp, peerConn}}>
+      <div>
+        Main
+        <Outlet/>
+        <Stack spacing={2} direction="row">
+          <Button variant="outlined" disabled={!getState()} onClick={goToCreateRoom}>Enter</Button>
+        </Stack>
+      </div>
+    </ContextOfConnected.Provider >
 
   );
 }
 
 export default App
+export {ContextOfConnected}

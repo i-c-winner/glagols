@@ -1,9 +1,13 @@
-import React from 'react';
+import React, {useContext} from 'react';
 import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
+import {ContextOfConnected} from "../../../App";
+
 function CreateRoom (props: any) {
+  const context=useContext(ContextOfConnected)
+  console.log(context)
   return (
     <div>
       <Box
