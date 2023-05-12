@@ -1,6 +1,7 @@
 const {Strophe}: any = require('strophe.js')
 const register: any = require('strophe-plugin-register')
 import getRandomText from "../plugins/getRandomText";
+import {onListeners, emitListeners} from "../plugins/createListeners";
 
 class XMPP {
   public xmpp: any;
@@ -56,6 +57,7 @@ class XMPP {
         console.log('add_track')
       } else {
         const rtcSd = new RTCSessionDescription((JSON.parse(window.atob(message))))
+        console.log(rtcSd, 'RTCSD')
         this.emit('setRemoteDescription', rtcSd)
       }
     }
@@ -74,45 +76,12 @@ class XMPP {
   getConnection() {
     return this.conn
   }
-
-  // doSignaling(message : any) {
-  //   const conn=this.getConnection()
-  //   const offer = new Strophe.Builder('message', {
-  //     type: 'chat',
-  //     to: 'admin_cs@prosolen.net'
-  //   }).c('body').t(message)
-  //   console.log(conn, offer)
-  //   conn.send(offer)
-  //   console.log(offer, 'this. is message')
-  // }
-  // addHandler() {
-  //   const conn=this.getConnection()
-  //   conn.addHandler(messageHandler)
-  //   function messageHandler(stanza: any) {
-  //     console.log(stanza, 'stanza')
-  //     const from = stanza.getAttribute('from');
-  //     const type = stanza.getAttribute('type');
-  //     console.log(from, type, )
-  //   }
-  //   console.log(conn)
-  // }
-
   on(event: string, callback: () => void) {
-    if (!this._listener[event]) {
-      this._listener[event] = []
-    }
-    this._listener[event].push(callback)
+    onListeners.call(this, event, callback)
   }
 
   emit(event: string, ...args: any[]) {
-    if (!this._listener[event]) {
-      console.error('Такая функция не установлена')
-    } else {
-      this._listener[event].forEach((listener: Function) => {
-        listener(args)
-      })
-    }
-
+    emitListeners.call(this, event, args[0])
   }
 }
 

@@ -5,6 +5,7 @@ import {useNavigate} from "react-router-dom";
 import peerConnection from "./src/WebRtc/WebRtc";
 import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
+import room from "./src/room/Room";
 
 xmpp.on('setRemoteDescription', setRemoteDescription)
 xmpp.on('xmppConnected', xmppConnected)
@@ -27,14 +28,14 @@ function xmppConnected() {
 
   function peerConnected(...args: any) {
     peerConn.then((pc: any) => {
-      pc.addTracks(args)
+      pc.addTracks(args[0])
     })
   }
 }
 
 function setRemoteDescription(...args: any) {
   peerConn.then((element: any) => {
-    element.pc.setRemoteDescription(args[0][0])
+    element.pc.setRemoteDescription(args[0])
   })
 }
 const ContextOfConnected= createContext({

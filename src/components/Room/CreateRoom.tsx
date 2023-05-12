@@ -7,7 +7,9 @@ import {ContextOfConnected} from "../../../App";
 
 function CreateRoom (props: any) {
   const context=useContext(ContextOfConnected)
-  console.log(context)
+  console.log(context.peerConn.then((res: any) => {
+      console.log(res)
+  }))
   return (
     <div>
       <Box

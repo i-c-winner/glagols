@@ -1,3 +1,5 @@
+import {onListeners, emitListeners} from "../plugins/createListeners";
+
 class PeerConnection {
   private pc: RTCPeerConnection;
   private streams: Promise<unknown>;
@@ -12,9 +14,9 @@ class PeerConnection {
         }
       ]
     })
-    this.pc.onicecandidate=(event =>{
-      if (event.candidate===null) {
-        const localDescription= window.btoa(JSON.stringify(this.pc.localDescription))
+    this.pc.onicecandidate = (event => {
+      if (event.candidate === null) {
+        const localDescription = window.btoa(JSON.stringify(this.pc.localDescription))
         this.emit('doSignaling', localDescription)
       }
     })
@@ -23,19 +25,20 @@ class PeerConnection {
     })
 
   }
-init() {
-  this.streams.then((streams: any) => {
-    this.emit('changePeerState')
-    this.emit('peerConnected', streams)
-  })
-}
+
+  init() {
+    this.streams.then((streams: any) => {
+      this.emit('changePeerState')
+      this.emit('peerConnected', streams)
+    })
+  }
 
   getPeerConnection() {
     return this.pc
   }
 
   addTracks(streams: any) {
-    streams[0][0] .getTracks().forEach((stream: MediaStreamTrack) => {
+    streams[0].getTracks().forEach((stream: MediaStreamTrack) => {
       this.pc.addTrack(stream)
     })
     this._createOffer()
@@ -49,40 +52,22 @@ init() {
   }
 
   setRemoteDescription(description: any) {
-    const pc=this.getPeerConnection()
+    const pc = this.getPeerConnection()
     try {
       pc.setRemoteDescription(description)
-    } catch(e)
-    {
-console.log('error', e)
+    } catch (e) {
+      console.log('error', e)
     }
-
-    // const pc = this.getPeerConnection()
-    // pc.addTransceiver('video', {'direction': 'recvonly'})
-    // pc.addTransceiver('audio', {'direction': 'recvonly'})
-    // pc.createOffer({'iceRestart': true}).then(offer =>
-    // {
-    //   pc.setLocalDescription(offer)
-    // })
   }
+
   on(event: string, callback: Function) {
-    if (!this._listener[event]) {
-      this._listener[event] = []
-    }
-    this._listener[event].push(callback)
+    onListeners.call(this, event, callback)
   }
 
   emit(event: string, ...args: any[]) {
-    if (!this._listener[event]) {
-      console.error('Такой слушатель не зарегестрирован')
-    } else {
-      this._listener[event].forEach((listener: Function) => {
-        listener(args)
-      })
-    }
-
+    emitListeners.call(this, event, args)
   }
 }
 
-const peerConnection =()=> new PeerConnection()
+const peerConnection = () => new PeerConnection()
 export default peerConnection
