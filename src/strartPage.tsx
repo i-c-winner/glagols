@@ -1,6 +1,6 @@
 import React, {useEffect, createRef} from "react";
 import {useNavigate} from "react-router-dom";
-import {changeRoom} from "./components/Room/sliceRoom";
+import {changeRoom} from "./components/room/sliceRoom";
 import Stack from "@mui/material/Stack";
 import Button from "@mui/material/Button";
 import {useDispatch} from "react-redux";
