@@ -2,7 +2,6 @@ import {onListeners, emitListeners} from "../plugins/createListeners";
 
 class PeerConnection {
   private pc: RTCPeerConnection;
-  private streams: Promise<unknown>;
   private _listener: { [key: string]: [...Function[]] };
 
   constructor() {
@@ -14,60 +13,57 @@ class PeerConnection {
         }
       ]
     })
-    this.pc.onicecandidate = (event => {
-      if (event.candidate === null) {
-        const localDescription = window.btoa(JSON.stringify(this.pc.localDescription))
-        this.emit('doSignaling', localDescription)
-      }
-    })
-    this.streams = new Promise((resolve: any, reject: any) => {
-      resolve(navigator.mediaDevices.getUserMedia({video: true, audio: true}))
-    })
+    // this.pc.onicecandidate = (event => {
+    //   if (event.candidate === null) {
+    //     const localDescription = window.btoa(JSON.stringify(this.pc.localDescription))
+    //     this.emit('doSignaling', localDescription)
+    //   }
+    // })
+    // this.streams = new Promise((resolve: any, reject: any) => {
+    //   resolve(navigator.mediaDevices.getUserMedia({video: true, audio: true}))
+    // })
 
   }
 
   init() {
-    this.streams.then((streams: any) => {
-      this.emit('changePeerState')
-      this.emit('peerConnected', streams)
-    })
+
   }
 
-  getPeerConnection() {
-    return this.pc
-  }
-
-  addTracks(streams: any) {
-    streams[0].getTracks().forEach((stream: MediaStreamTrack) => {
-      this.pc.addTrack(stream)
-    })
-    this._createOffer()
-  }
-
-  _createOffer() {
-    const pc = this.getPeerConnection()
-    pc.createOffer().then((offer: any) => {
-      pc.setLocalDescription(offer)
-    })
-  }
-
-  setRemoteDescription(description: any) {
-    const pc = this.getPeerConnection()
-    try {
-      pc.setRemoteDescription(description)
-    } catch (e) {
-      console.log('error', e)
-    }
-  }
-
-  on(event: string, callback: Function) {
-    onListeners.call(this, event, callback)
-  }
-
-  emit(event: string, ...args: any[]) {
-    emitListeners.call(this, event, args)
-  }
+  // getPeerConnection() {
+  //   return this.pc
+  // }
+  //
+  // addTracks(streams: any) {
+  //   streams[0].getTracks().forEach((stream: MediaStreamTrack) => {
+  //     this.pc.addTrack(stream)
+  //   })
+  //   this._createOffer()
+  // }
+  //
+  // _createOffer() {
+  //   const pc = this.getPeerConnection()
+  //   pc.createOffer().then((offer: any) => {
+  //     pc.setLocalDescription(offer)
+  //   })
+  // }
+  //
+  // setRemoteDescription(description: any) {
+  //   const pc = this.getPeerConnection()
+  //   try {
+  //     pc.setRemoteDescription(description)
+  //   } catch (e) {
+  //     console.log('error', e)
+  //   }
+  // }
+  //
+  // on(event: string, callback: Function) {
+  //   onListeners.call(this, event, callback)
+  // }
+  //
+  // emit(event: string, ...args: any[]) {
+  //   emitListeners.call(this, event, args)
+  // }
 }
 
-const peerConnection = () => new PeerConnection()
-export default peerConnection
+
+export default PeerConnection

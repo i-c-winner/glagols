@@ -1,5 +1,5 @@
 import React, {useState, createContext,} from "react";
-import {xmpp} from "./src/XMPP/xmpp";
+import {XMPP} from "./src/XMPP/xmpp";
 import {Outlet} from "react-router-dom";
 import {useNavigate} from "react-router-dom";
 import peerConnection from "./src/WebRtc/WebRtc";
@@ -83,4 +83,4 @@ const App = function () {
 }
 
 export default App
-export {ContextOfConnected}
+// export {ContextOfConnected}

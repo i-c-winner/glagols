@@ -6,8 +6,11 @@ import Button from "@mui/material/Button";
 import {useDispatch} from "react-redux";
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
+import Glagol from "./App/Glagol";
 
 function StartPage() {
+
+  Glagol.xmpp.init()
   const navigate = useNavigate()
   const dispatch = useDispatch()
   const inputRef = createRef<any>()
