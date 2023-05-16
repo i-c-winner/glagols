@@ -55,6 +55,8 @@ class XMPP {
   }
 
   init() {
+    this.connection.addHandler(this.addHandler)
+    console.log(this.connection)
     this.connection.register.connect("@prosolen.net", this.callbackRegistry)
   }
 
@@ -84,8 +86,7 @@ class XMPP {
     } else if (status === Strophe.Status.REGIFAIL) {
       console.log("The Server does not support In-Band Registration")
     } else if (status === Strophe.Status.CONNECTED) {
-      console.log(this.connection, 'CONNECTION LOL')
-      this.connection.addHandler(this.addHandler)
+
     }
   }
 
@@ -110,12 +111,13 @@ class XMPP {
   createRoom(roomName: string) {
     const message = new Strophe.Builder('presence', {
       from: `${this.connection.jid}`,
-      to: `${roomName}@prosolen.net/${this.connection.jid.split('/')[1]}`
+      to: `${roomName}@conference.prosolen.net/${this.connection.jid.split('/')[1]}`
     }).c('x', {
       xmlns: 'http://jabber.org/protocol/muc'
     })
+    console.log(message)
     this.connection.send(message)
-    console.log(this.connection, 'Connection')
+
   }
 
   xmppOnListener(event: string, callback: Function) {

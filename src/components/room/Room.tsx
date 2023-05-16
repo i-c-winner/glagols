@@ -9,7 +9,9 @@ import {useSelector} from "react-redux";
 
 function Room() {
   if (!Glagol.xmpp.getInitialStatus()) {
+    console.log()
     Glagol.xmpp.init()
+    Glagol.xmpp.initialization()
   }
   const roomName=useSelector((state: any)=>state.roomName)
   const inputRef = createRef<any>()
