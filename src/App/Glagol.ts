@@ -7,7 +7,7 @@ const Glagol = {
   },
   peerAddListener : function(event : string, callback : Function) : void {
       this.xmpp.peerOnListener(event, callback)
-  }
+  },
 }
 
 export default Glagol

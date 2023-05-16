@@ -3,6 +3,8 @@ import {onListeners, emitListeners} from "../plugins/createListeners";
 class PeerConnection {
   private pc: RTCPeerConnection;
   private _listener: { [key: string]: [...Function[]] };
+  private localDescription: any;
+  private stream: any;
 
   constructor() {
     this._listener = {}
@@ -13,12 +15,11 @@ class PeerConnection {
         }
       ]
     })
-    // this.pc.onicecandidate = (event => {
-    //   if (event.candidate === null) {
-    //     const localDescription = window.btoa(JSON.stringify(this.pc.localDescription))
-    //     this.emit('doSignaling', localDescription)
-    //   }
-    // })
+    this.pc.onicecandidate = (event => {
+      if (event.candidate === null) {
+        this.localDescription = window.btoa(JSON.stringify(this.pc.localDescription))
+      }
+    })
     // this.streams = new Promise((resolve: any, reject: any) => {
     //   resolve(navigator.mediaDevices.getUserMedia({video: true, audio: true}))
     // })
@@ -26,7 +27,9 @@ class PeerConnection {
   }
 
   init() {
-
+    navigator.mediaDevices.getUserMedia({video: true, audio: true}).then((stream: MediaStream) => {
+      this.stream = stream
+    })
   }
 
   // getPeerConnection() {

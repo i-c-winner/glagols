@@ -60,6 +60,10 @@ class XMPP {
     this.connection.register.connect("@prosolen.net", this.callbackRegistry)
   }
 
+  peerInit() {
+    this.peerConnection.init()
+  }
+
   initialization() {
     this.initialized = true
   }
@@ -95,7 +99,7 @@ class XMPP {
     const type = stanza.getAttribute('type');
     const elems = stanza.getElementsByTagName('body');
     const message = Strophe.getText(elems[0]);
-    console.log(stanza)
+    console.log(message, elems, stanza)
     if (type === 'chat') {
       if (message === 'add_track') {
         console.log('add_track')
@@ -115,9 +119,26 @@ class XMPP {
     }).c('x', {
       xmlns: 'http://jabber.org/protocol/muc'
     })
-    console.log(message)
     this.connection.send(message)
+  }
 
+  getRoom() {
+    // <iq from='hag66@shakespeare.lit/pda'
+    // id='zb8q41f4'
+    // to='chat.shakespeare.lit'
+    // type='get'>
+    // <query xmlns='http://jabber.org/protocol/disco#items'/>
+    //   </iq>
+
+    const message = new Strophe.Builder('iq', {
+      to: 'conference.prosolen.net',
+      id:'zb8q41f4',
+      from: `${this.connection.jid}`,
+      type: 'get'
+    }).c('query', {
+      xmlns: 'http://jabber.org/protocol/disco#items'
+    })
+    this.connection.send(message)
   }
 
   xmppOnListener(event: string, callback: Function) {
