@@ -9,13 +9,16 @@ import TextField from "@mui/material/TextField";
 import Glagol from "./App/Glagol";
 
 function StartPage() {
+  const navigate = useNavigate()
+  const inputRef = createRef<any>()
+  const roomName = window.location.pathname.split('/')[1]
 
   Glagol.xmpp.init()
-  const navigate = useNavigate()
+  Glagol.xmpp.initialization()
+
   const dispatch = useDispatch()
-  const inputRef = createRef<any>()
+
   useEffect(() => {
-    const roomName = window.location.pathname.split('/')[1]
     if (roomName !== "") {
       dispatch(changeRoom(roomName))
       navigate(`/${roomName}`)
@@ -25,11 +28,12 @@ function StartPage() {
   function createRoom() {
     if (typeof inputRef.current.value === 'string') {
       dispatch(changeRoom(inputRef.current.value))
-           navigate(`/${inputRef.current.value}`)
+      navigate(`/${inputRef.current.value}`)
     } else {
       console.error('roomName must be string')
     }
   }
+
   return (
     <div>
       <Box

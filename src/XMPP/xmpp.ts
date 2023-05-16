@@ -3,20 +3,28 @@ const register: any = require('strophe-plugin-register')
 import getRandomText from "../plugins/getRandomText";
 import {onListeners, emitListeners} from "../plugins/createListeners";
 import PeerConnection from "../WebRtc/WebRtc";
-const peerConnection=new PeerConnection()
+
+const peerConnection = new PeerConnection()
+
 class XMPP {
   public xmpp: any;
   public conn: any;
   private _listener: { [key: string]: [...Function[]] };
   private connection: any;
   private peerConnection: PeerConnection;
+  private password: string;
+  private userName: string;
+  private initialized: boolean;
 
 
   constructor() {
+    this.initialized=false
     this._listener = {}
     this.conn = null
     this.connection = new Strophe.Connection('https://xmpp.prosolen.net:5281/http-bind')
-    this.peerConnection=peerConnection
+    this.peerConnection = peerConnection
+    this.password= getRandomText(7)
+    this.userName=getRandomText(5)
     // this.xmpp.then((connection: any) => {
     //   this.conn = connection
     //   connection.addHandler(this.addHandler)
@@ -47,50 +55,67 @@ class XMPP {
   }
 
   init() {
-   this.connection.register.connect("@prosolen.net", this.callbackRegistry)
+    this.connection.register.connect("@prosolen.net", this.callbackRegistry)
+  }
+  initialization() {
+      this.initialized=true
+  }
+  getInitialStatus() {
+      return this.initialized
   }
 
-callbackRegistry=(status: any)=> {
-          if (status === Strophe.Status.REGISTER) {
-            // fill out the fields
-            this.connection.register.fields.username = getRandomText(5);
-            this.connection.register.fields.password = getRandomText(7);
-            // calling submit will continue the registration process
-            this.connection.register.submit();
-          } else if (status === Strophe.Status.REGISTERED) {
-            console.log("registered!");
-            // calling login will authenticate the registered JID.
-            this.connection.authenticate();
-          } else if (status === Strophe.Status.CONFLICT) {
-            console.log("Contact already existed!");
-          } else if (status === Strophe.Status.NOTACCEPTABLE) {
-            console.log("Registration form not properly filled out.")
-          } else if (status === Strophe.Status.REGIFAIL) {
-            console.log("The Server does not support In-Band Registration")
-          } else if (status === Strophe.Status.CONNECTED) {
-        }
+  callbackRegistry = (status: any) => {
+    if (status === Strophe.Status.REGISTER) {
+      // fill out the fields
+      this.connection.register.fields.username = this.userName;
+      this.connection.register.fields.password = this.password;
+      // calling submit will continue the registration process
+      this.connection.register.submit();
+    } else if (status === Strophe.Status.REGISTERED) {
+      console.log("registered!");
+      // calling login will authenticate the registered JID.
+      this.connection.authenticate();
+    } else if (status === Strophe.Status.CONFLICT) {
+      console.log("Contact already existed!");
+    } else if (status === Strophe.Status.NOTACCEPTABLE) {
+      console.log("Registration form not properly filled out.")
+    } else if (status === Strophe.Status.REGIFAIL) {
+      console.log("The Server does not support In-Band Registration")
+    } else if (status === Strophe.Status.CONNECTED) {
+      console.log(this.connection, 'CONNECTION LOL')
+      this.connection.addHandler(this.addHandler)
+    }
   }
 
-  // addHandler = (stanza: any) => {
-  //   const from = stanza.getAttribute('from');
-  //   const type = stanza.getAttribute('type');
-  //   const elems = stanza.getElementsByTagName('body');
-  //   const message = Strophe.getText(elems[0]);
-  //   if (type === 'chat') {
-  //     if (message === 'add_track') {
-  //       console.log('add_track')
-  //     } else {
-  //       const rtcSd = new RTCSessionDescription((JSON.parse(window.atob(message))))
-  //       console.log(rtcSd, 'RTCSD')
-  //       this.emit('setRemoteDescription', rtcSd)
-  //     }
-  //   }
-  //   return true
-  // }
+  addHandler = (stanza: any) => {
+    const from = stanza.getAttribute('from');
+    const type = stanza.getAttribute('type');
+    const elems = stanza.getElementsByTagName('body');
+    const message = Strophe.getText(elems[0]);
+    if (type === 'chat') {
+      if (message === 'add_track') {
+        console.log('add_track')
+      } else {
+        const rtcSd = new RTCSessionDescription((JSON.parse(window.atob(message))))
+        console.log(rtcSd, 'RTCSD')
+        this.emit('setRemoteDescription', rtcSd)
+      }
+    }
+    return true
+  }
 
-
-  on(event: string, callback: () => void) {
+createRoom(roomName : string){
+//     const message=new Strophe.Builder('presence', {
+// from : `${this.userName}@prosolen.net`
+//     })
+  console.log(this.connection, 'Connection')
+}
+  xmppOnListener(event: string, callback: Function) {
     onListeners.call(this, event, callback)
+  }
+
+  peerOnListener(event: string, callback: Function) {
+    this.peerConnection.on(event, callback)
   }
 
   emit(event: string, ...args: any[]) {

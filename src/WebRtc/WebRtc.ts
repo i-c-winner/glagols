@@ -56,10 +56,10 @@ class PeerConnection {
   //   }
   // }
   //
-  // on(event: string, callback: Function) {
-  //   onListeners.call(this, event, callback)
-  // }
-  //
+  on(event: string, callback: Function) {
+    onListeners.call(this, event, callback)
+  }
+
   // emit(event: string, ...args: any[]) {
   //   emitListeners.call(this, event, args)
   // }
