@@ -18,13 +18,13 @@ class XMPP {
 
 
   constructor() {
-    this.initialized=false
+    this.initialized = false
     this._listener = {}
     this.conn = null
     this.connection = new Strophe.Connection('https://xmpp.prosolen.net:5281/http-bind')
     this.peerConnection = peerConnection
-    this.password= getRandomText(7)
-    this.userName=getRandomText(5)
+    this.password = getRandomText(7)
+    this.userName = getRandomText(5)
     // this.xmpp.then((connection: any) => {
     //   this.conn = connection
     //   connection.addHandler(this.addHandler)
@@ -57,11 +57,13 @@ class XMPP {
   init() {
     this.connection.register.connect("@prosolen.net", this.callbackRegistry)
   }
+
   initialization() {
-      this.initialized=true
+    this.initialized = true
   }
+
   getInitialStatus() {
-      return this.initialized
+    return this.initialized
   }
 
   callbackRegistry = (status: any) => {
@@ -92,6 +94,7 @@ class XMPP {
     const type = stanza.getAttribute('type');
     const elems = stanza.getElementsByTagName('body');
     const message = Strophe.getText(elems[0]);
+    console.log(stanza)
     if (type === 'chat') {
       if (message === 'add_track') {
         console.log('add_track')
@@ -104,12 +107,17 @@ class XMPP {
     return true
   }
 
-createRoom(roomName : string){
-//     const message=new Strophe.Builder('presence', {
-// from : `${this.userName}@prosolen.net`
-//     })
-  console.log(this.connection, 'Connection')
-}
+  createRoom(roomName: string) {
+    const message = new Strophe.Builder('presence', {
+      from: `${this.connection.jid}`,
+      to: `${roomName}@prosolen.net/${this.connection.jid.split('/')[1]}`
+    }).c('x', {
+      xmlns: 'http://jabber.org/protocol/muc'
+    })
+    this.connection.send(message)
+    console.log(this.connection, 'Connection')
+  }
+
   xmppOnListener(event: string, callback: Function) {
     onListeners.call(this, event, callback)
   }
